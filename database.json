@@ -1,0 +1,118 @@
+{
+  "users": {
+    "admin": {
+      "password": "admin123",
+      "role": "admin"
+    }
+  },
+  "students": {
+    "erick": {
+      "password": "mphande",
+      "course": "BSC",
+      "role": "student",
+      "timetable": []
+    },
+    "thoko": {
+      "password": "pindani",
+      "course": "BSC",
+      "role": "student",
+      "timetable": []
+    },
+    "bbb": {
+      "password": "nnn",
+      "course": "BCE",
+      "role": "student",
+      "timetable": []
+    },
+    "ddd": {
+      "password": "sss",
+      "course": "BCOM",
+      "role": "student",
+      "timetable": []
+    },
+    "www": {
+      "password": "eee",
+      "course": "BSC",
+      "role": "student",
+      "timetable": []
+    },
+    "aaa": {
+      "password": "sss",
+      "course": "BCOM",
+      "role": "student",
+      "timetable": []
+    }
+  },
+  "lecturers": {
+    "111": {
+      "password": "111",
+      "role": "lecturer",
+      "batches": []
+    },
+    "hey": {
+      "password": "you",
+      "role": "lecturer",
+      "batches": []
+    },
+    "res": {
+      "password": "ras",
+      "role": "lecturer",
+      "batches": []
+    },
+    "qqq": {
+      "password": "xxx",
+      "role": "lecturer",
+      "batches": []
+    }
+  },
+  "rooms": {
+    "lh2": {
+      "name": "LH2",
+      "capacity": 30,
+      "type": "Lecture"
+    }
+  },
+  "modules": {
+    "351_cs_23": {
+      "name": "351 CS 23",
+      "description": "Introduction to Computer Science",
+      "credit_hours": 3
+    }
+  },
+  "batches": {
+    "batch_11": {
+      "name": "Batch 11",
+      "year": 2024,
+      "course": "BSC"
+    }
+  },
+  "timetables": {
+    "BCOM": [
+      {
+        "day": "234",
+        "time": "234",
+        "subject": "33",
+        "classroom": "lh3",
+        "lecture": "well"
+      }
+    ],
+    "BSC": [
+      {
+        "day": "qqq",
+        "time": "qqq",
+        "subject": "qqq",
+        "classroom": "qqq",
+        "lecture": "qqq"
+      }
+    ],
+    "BE": [
+      {
+        "day": "qqq",
+        "time": "qqqq",
+        "subject": "qqq",
+        "classroom": "qqq",
+        "lecture": "qqq"
+      }
+    ]
+  }
+}

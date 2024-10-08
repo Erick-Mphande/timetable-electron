@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Lecturer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Add Lecturer</h1>
+    <form id="addLecturerForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Add Lecturer</button>
+        <button id="backButton">Back</button>
+    </form>
+
+    <p id="message"></p>
+
+    
+
+    <script>
+        document.getElementById('addLecturerForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const password = document.getElementById('password').value;
+
+            fetch('http://localhost:3000/register/lecturer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, password, isAdmin: true }),  // Admin is adding
+            })
+            .then(response => response.text())
+            .then(message => {
+                document.getElementById('message').innerText = message;
+            })
+            .catch(error => {
+                document.getElementById('message').innerText = 'Failed to add lecturer: ' + error;
+            });
+        });
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = 'adminD.html';
+        });
+    </script>
+</body>
+</html>

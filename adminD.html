@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <h2>Manage Users</h2>
+
+    <div id="controls">
+        <button id="addStudentBtn">Add Student</button>
+        <button id="addLecturerBtn">Add Lecturer</button>
+        <button id="viewUsersBtn">View All Users</button>
+        <button id="createTimetableBtn">Create Timetable</button>
+        <button id="viewTimetableBtn">View Timetable</button> <!-- New button -->
+        <button id="backButton">Logout</button>
+     
+    </div>
+
+    <div id="userTableContainer">
+        <table id="userTable" style="display:none">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Course/Batches</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- Table rows will be dynamically generated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigate to the Add Student page
+            document.getElementById('addStudentBtn').addEventListener('click', function() {
+                window.location.href = 'add-student.html';
+            });
+
+            // Navigate to the Add Lecturer page
+            document.getElementById('addLecturerBtn').addEventListener('click', function() {
+                window.location.href = 'add-lecturer.html';
+            });
+
+            // Navigate to the Create Timetable page
+            document.getElementById('createTimetableBtn').addEventListener('click', function() {
+                window.location.href = 'create-timetable.html'; // New page for creating timetable
+            });
+
+            // Navigate to the View Timetable page
+            document.getElementById('viewTimetableBtn').addEventListener('click', function() {
+                window.location.href = 'view-timetable.html'; // New page for viewing timetable
+            });
+
+            // Fetch and display all users (students and lecturers) in a table
+            document.getElementById('viewUsersBtn').addEventListener('click', function() {
+                console.log('View All Users button clicked'); // Debugging log
+                fetch('http://localhost:3000/admin/viewUsers')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(users => {
+                        const userTable = document.getElementById('userTable');
+                        const userTableBody = document.getElementById('userTableBody');
+                        userTableBody.innerHTML = '';  // Clear previous entries
+
+                        // Display students
+                        users.students.forEach(student => {
+                            userTableBody.innerHTML += `
+                                <tr>
+                                    <td>${student.username}</td>
+                                    <td>Student</td>
+                                    <td>${student.course}</td>
+                                    <td><button onclick="deleteUser('student', '${student.username}')">Delete</button></td>
+                                </tr>
+                            `;
+                        });
+
+                        // Display lecturers
+                        users.lecturers.forEach(lecturer => {
+                            userTableBody.innerHTML += `
+                                <tr>
+                                    <td>${lecturer.username}</td>
+                                    <td>Lecturer</td>
+                                    <td>${lecturer.batches.join(', ')}</td>
+                                    <td><button onclick="deleteUser('lecturer', '${lecturer.username}')">Delete</button></td>
+                                </tr>
+                            `;
+                        });
+
+                        userTable.style.display = 'table';  // Show the table
+                    })
+                    .catch(error => {
+                        console.error('Error fetching users:', error);
+                    });
+            });
+
+            // Function to delete a user (student or lecturer)
+            window.deleteUser = function(role, username) {
+                let url = role === 'student' 
+                    ? 'http://localhost:3000/admin/deleteStudent' 
+                    : 'http://localhost:3000/admin/deleteLecturer';
+
+                if (confirm(`Are you sure you want to delete ${role} ${username}?`)) {
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username })
+                    })
+                    .then(response => response.text())
+                    .then(message => {
+                        alert(message);
+                        document.getElementById('viewUsersBtn').click();  // Refresh the table after deletion
+                    })
+                    .catch(error => {
+                        console.error('Error deleting user:', error);
+                    });
+                }
+            };
+
+            // Navigate to the login page
+            document.getElementById('backButton').addEventListener('click', function() {
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>

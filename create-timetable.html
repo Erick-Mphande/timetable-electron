@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Timetable</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        /* Flex container for dropdown alignment */
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            width: 150px; /* Fixed width for labels to align them properly */
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+            width: 200px; /* Adjust width of the dropdowns */
+        }
+
+        /* Style for timetable entries */
+        #timetableEntries {
+            margin-bottom: 20px; /* Add some space below the entries */
+        }
+
+        button {
+            margin-right: 10px; /* Space between buttons */
+        }
+
+        /* Centering buttons in a flex container */
+        .buttonContainer {
+            display: flex;
+            justify-content: flex-start; /* Align buttons to the left */
+            gap: 10px; /* Space between buttons */
+        }
+
+        /* Style for timetable entry inputs */
+        .entry input {
+            margin-right: 10px;
+            padding: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create Timetable</h1>
+
+    <div class="form-group">
+        <label for="programSelect">Select Program:</label>
+        <select id="programSelect">
+            <option value="BSC">BSC</option>
+            <option value="BCOM">BCOM</option>
+            <option value="BSW">BSW</option>
+            <option value="BE">BE</option>
+            <option value="BBA">BBA</option>
+            <option value="BAEDU">BAEDU</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="yearSelect">Select Year:</label>
+        <select id="yearSelect">
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+            <option value="5">5th Year</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="semesterSelect">Select Semester:</label>
+        <select id="semesterSelect">
+            <option value="1">1st Semester</option>
+            <option value="2">2nd Semester</option>
+            <option value="3">3rd Semester</option>
+            <option value="4">4th Semester</option>
+            <option value="5">5th Semester</option>
+            <option value="6">6th Semester</option>
+            <option value="7">7th Semester</option>
+            <option value="8">8th Semester</option>
+            <option value="9">9th Semester</option>
+            <option value="10">10th Semester</option>
+        </select>
+    </div>
+
+    <h3>Timetable Entries</h3>
+    <div id="timetableEntries">
+        <div class="entry">
+            <label>Day:</label>
+            <input type="text" class="day" placeholder="e.g., Monday">
+            <label>Time:</label>
+            <input type="text" class="time" placeholder="e.g., 10:00 - 11:00">
+            <label>Subject:</label>
+            <input type="text" class="subject" placeholder="e.g., 351 CS 23">
+            <label>Classroom:</label>
+            <input type="text" class="classroom" placeholder="e.g., LH2">
+
+            <button class="removeEntry">Remove</button>
+        </div>
+    </div>
+
+    <div class="buttonContainer">
+        <button id="addEntry">Add Another Entry</button>
+        <button id="saveTimetable">Save Timetable</button>
+        <button id="backButton">Back</button>
+    </div>
+
+    <script>
+        // Event listener for adding new timetable entries
+        document.getElementById('addEntry').addEventListener('click', function() {
+            const newEntry = document.createElement('div');
+            newEntry.className = 'entry';
+            newEntry.innerHTML = `
+                <label>Day:</label>
+                <input type="text" class="day" placeholder="e.g., Monday">
+                <label>Time:</label>
+                <input type="text" class="time" placeholder="e.g., 10:00 - 11:00">
+                <label>Subject:</label>
+                <input type="text" class="subject" placeholder="e.g., 351 CS 23">
+                <label>Classroom:</label>
+                <input type="text" class="classroom" placeholder="e.g., LH2">
+                <button class="removeEntry">Remove</button>
+            `;
+
+            // Event listener for remove button
+            newEntry.querySelector('.removeEntry').addEventListener('click', function() {
+                newEntry.remove();
+            });
+
+            document.getElementById('timetableEntries').appendChild(newEntry);
+        });
+
+        // Event listener for saving the timetable
+        document.getElementById('saveTimetable').addEventListener('click', function() {
+            const program = document.getElementById('programSelect').value;
+            const year = document.getElementById('yearSelect').value;
+            const semester = document.getElementById('semesterSelect').value;
+            const entries = Array.from(document.querySelectorAll('.entry')).map(entry => ({
+                day: entry.querySelector('.day').value,
+                time: entry.querySelector('.time').value,
+                subject: entry.querySelector('.subject').value,
+                classroom: entry.querySelector('.classroom').value,
+            }));
+
+            // Send the timetable data to the server, including year, semester, and selected lecture
+            fetch('http://localhost:3000/admin/createTimetable', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ program, year, semester, entries })
+            })
+            .then(response => response.text())
+            .then(message => {
+                alert(message);
+            })
+            .catch(error => {
+                console.error('Error saving timetable:', error);
+            });
+        });
+        
+        // Event listener for back button
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = 'adminD.html';
+        });
+    </script>
+</body>
+</html>

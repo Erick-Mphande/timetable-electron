@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecturer Dashboard</title> <!-- Changed title to Lecturer Dashboard -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add some basic styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #4CAF50; /* Green background for the header */
+            color: white; /* White text for contrast */
+        }
+    </style>
+</head>
+<body>
+    <h1>Lecturer Dashboard</h1> <!-- Changed header to Lecturer Dashboard -->
+    <p>Welcome, <span id="username"></span>!</p> <!-- Placeholder for the lecturer's name -->
+
+    <h2>Your Timetable</h2>
+    <div>
+        <label for="programSelect">Select Program:</label>
+        <select id="programSelect">
+            <option value="BSC">BSC</option>
+            <option value="BCOM">BCOM</option>
+            <option value="BSW">BSW</option>
+            <option value="BE">BE</option>
+            <option value="BBA">BBA</option>
+            <option value="BAEDU">BAEDU</option>
+
+            <!-- Add more programs as needed -->
+        </select>
+        <button id="viewTimetableBtn">View Timetable</button>
+        <button id="backBtn">Logout</button>
+    </div>
+
+    <div id="timetableDisplay"></div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const username = params.get('user'); // Get the username from the query string
+        document.getElementById('username').innerText = username; // Display the username
+
+        document.getElementById('viewTimetableBtn').addEventListener('click', function() {
+            const program = document.getElementById('programSelect').value;
+
+            fetch(`http://localhost:3000/timetable/${program}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(timetable => {
+                    const timetableDisplay = document.getElementById('timetableDisplay');
+                    timetableDisplay.innerHTML = '<h3>Timetable</h3>';
+
+                    if (!timetable || timetable.length === 0) {
+                        timetableDisplay.innerHTML += '<p>No timetable entries found for this program.</p>';
+                        return;
+                    }
+
+                    // Create the table
+                    let table = '<table>';
+                    table += `
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Classroom</th>
+                        </tr>
+                    `;
+
+                    timetable.forEach(entry => {
+                        table += `
+                            <tr>
+                                <td>${entry.day}</td>
+                                <td>${entry.time}</td>
+                                <td>${entry.subject}</td>
+                                <td>${entry.classroom}</td>
+                            </tr>
+                        `;
+                    });
+
+                    table += '</table>';
+                    timetableDisplay.innerHTML += table;
+
+                    // Set reminder for the next class
+                    setReminder(timetable);
+                })
+                .catch(error => {
+                    console.error('Error fetching timetable:', error);
+                    const timetableDisplay = document.getElementById('timetableDisplay');
+                    timetableDisplay.innerHTML = '<p>Error loading timetable. Please try again later.</p>';
+                });
+        });
+
+        function setReminder(timetable) {
+            const now = new Date();
+            let nextClass = null;
+
+            // Find the next upcoming class
+            timetable.forEach(entry => {
+                const [classHour, classMinute] = entry.time.split(':').map(Number);
+                const classDate = new Date(now);
+                classDate.setHours(classHour);
+                classDate.setMinutes(classMinute);
+                classDate.setSeconds(0);
+
+                if (classDate > now && (!nextClass || classDate < nextClass.classDate)) {
+                    nextClass = { ...entry, classDate };
+                }
+            });
+
+            if (nextClass) {
+                notifyUser(nextClass);
+            }
+        }
+
+        function notifyUser(classDetails) {
+            // Check for notification permission
+            if (Notification.permission === 'granted') {
+                new Notification(`Upcoming Class: ${classDetails.subject}`, {
+                    body: `Next class is on ${classDetails.day} at ${classDetails.time} in ${classDetails.classroom}.`
+                });
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification(`Upcoming Class: ${classDetails.subject}`, {
+                            body: `Next class is on ${classDetails.day} at ${classDetails.time} in ${classDetails.classroom}.`
+                        });
+                    }
+                });
+            }
+        }
+
+        document.getElementById('backBtn').addEventListener('click', function() {
+            // Logic to go back to the previous page or to another section
+            window.history.back(); // This will navigate to the previous page in the browser history
+        });
+    </script>
+</body>
+</html>
